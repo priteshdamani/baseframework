@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PreUpdate;
 
 /**
  * Created by pritesh on 12/8/13.
@@ -37,6 +38,11 @@ public abstract class AbstractPrimaryObject extends DomainObject {
 
     public void setDeletedDate(DateTime deletedDate) {
         this.deletedDate = deletedDate;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        modifiedDate = new DateTime();
     }
 
     @Override

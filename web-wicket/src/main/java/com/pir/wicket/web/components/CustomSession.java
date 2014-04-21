@@ -15,7 +15,7 @@ import org.apache.wicket.request.Request;
 public class CustomSession extends WebSession {
 
     // the user id of the logged in user
-    private Long userId;
+    private Long userId = null;
     private boolean admin = false;
 
     /**

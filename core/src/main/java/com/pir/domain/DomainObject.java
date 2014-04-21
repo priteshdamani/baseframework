@@ -61,6 +61,11 @@ public class DomainObject implements Serializable {
         return this.getId().equals(o.getId());
     }
 
+    @PrePersist
+    protected void onCreate() {
+        createdDate = new DateTime();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

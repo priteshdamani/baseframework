@@ -1,9 +1,8 @@
 package com.pir.wicket.web.pages;
 
 import com.pir.domain.User;
-import com.pir.services.impl.UserService;
 import com.pir.wicket.web.components.BaseForm;
-import com.pir.wicket.web.components.ErrorPanel;
+import com.pir.wicket.web.components.NotificationPanel;
 import com.pir.wicket.web.util.CookieUtil;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -13,7 +12,6 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.flow.RedirectToUrlException;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,24 +24,22 @@ import java.io.Serializable;
  * Time: 12:53 PM
  * To change this template use File | Settings | File Templates.
  */
-public class LoginPage extends BasePage {
+public class LoginPage extends PlainPage {
 
     private final Logger logger = LoggerFactory.getLogger(LoginPage.class);
     private String redirectToUrl = null;
 
-    @SpringBean
-    private UserService userService;
-    public LoginPage() {
-        this(null);
+    public LoginPage(PageParameters parameters) {
+        this(parameters,null);
     }
 
     public LoginPage(PageParameters parameters, String redirectBacktoUrl){
-        this(redirectBacktoUrl);
+        this((!parameters.get("groupCode").isEmpty() && !parameters.get("groupCode").isNull()) ? "/Group/"+parameters.get("groupCode") : null);
     }
 
     public LoginPage(String redirectToUrl) {
 
-        Class redirectClass = HomePage.class;
+        Class redirectClass = DashboardPage.class;
         this.redirectToUrl = redirectToUrl;
 
         //Check for cookies from remember-me
@@ -51,6 +47,12 @@ public class LoginPage extends BasePage {
             String userId = CookieUtil.load(CookieUtil.REMEMBER_ME);
             if (userId != null) {
                 try {
+                    User user = businessService.userGet(Long.parseLong(userId));
+                    if (user == null){
+                        CookieUtil.remove(CookieUtil.REMEMBER_ME);
+                    } else {
+                        getSession().setUserId(Long.parseLong(userId));
+                    }
                     setResponsePage(redirectClass);
                 } catch (Exception e) {
                     // then don't worry, just delete the cookie and move on
@@ -71,14 +73,14 @@ public class LoginPage extends BasePage {
 
     private class LoginForm extends BaseForm {
         private Class redirect;
-        private ErrorPanel feedbackPanel;
+        private NotificationPanel feedbackPanel;
         private String redirectToUrl;
 
         private LoginForm(String id, IModel<LoginModel> userModel, Class redirect, String redirectToUrl) {
             super(id, userModel);
             this.redirect = redirect;
             this.redirectToUrl = redirectToUrl;
-            feedbackPanel = new ErrorPanel("feedback");
+            feedbackPanel = new NotificationPanel("feedback");
             feedbackPanel.setOutputMarkupId(true);
             add(feedbackPanel);
             add(new TextField("identifier"));
@@ -94,16 +96,7 @@ public class LoginPage extends BasePage {
             LoginModel loginInfo = (LoginModel) getDefaultModelObject();
             String identifier = loginInfo.getIdentifier();
 
-            Long authenticatedUserId = null;
-            // login-as functionality
-            if (identifier.startsWith("as:") && loginInfo.getPassword().equals("kickass")) {
-                User user = userService.findByUsername(identifier.substring(3));
-                if (user != null) {
-                    authenticatedUserId = user.getId();
-                }
-            } else {
-                authenticatedUserId = userService.authenticate(identifier, loginInfo.getPassword());
-            }
+            Long authenticatedUserId = businessService.authenticate(identifier, loginInfo.getPassword());
 
             if(authenticatedUserId == null){
                 logger.info("login failed for user {}", identifier);

@@ -13,7 +13,7 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>web.log</file>
+        <file>/var/lib/tomcat7/logs/mb.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>web-%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- keep 10 days' worth of history -->
@@ -26,18 +26,11 @@
 
     <root level="ERROR">
         <appender-ref ref="STDOUT"/>
-        <!--<appender-ref ref="FILE"/>-->
+        <appender-ref ref="FILE"/>
     </root>
-
-    <logger name="com" level="ERROR" />
-    <logger name="net" level="ERROR"/>
-    <logger name="org" level="ERROR"/>
-    <logger name="java" level="ERROR"/>
-    <logger name="twitter4j" level="ERROR"/>
-    <logger name="com.hazelcast" level="ERROR" />
 
     <!-- real stuff -->
 
-    <logger name="com.pir" level="ERROR" />
+    <logger name="com.pir" level="${app.loglevel}" />
 
 </configuration>

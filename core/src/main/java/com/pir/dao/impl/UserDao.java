@@ -2,6 +2,7 @@ package com.pir.dao.impl;
 
 import com.pir.dao.IUserDao;
 import com.pir.domain.User;
+import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
@@ -35,5 +36,12 @@ public class UserDao extends BaseDaoImpl<User> implements IUserDao {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public List<User> searchUsersForGroup(Long groupId) {
+        Query query = getSession().createQuery("select distinct u from User u left join u.groupLinks ug where ug.group.id = :groupId ");
+        query.setParameter("groupId",groupId);
+        return query.list();
     }
 }

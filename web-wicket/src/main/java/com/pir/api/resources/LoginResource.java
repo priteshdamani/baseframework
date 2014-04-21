@@ -3,7 +3,7 @@ package com.pir.api.resources;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pir.api.dto.LoginDto;
 import com.pir.api.dto.Response;
-import com.pir.services.impl.UserService;
+import com.pir.services.IBusinessService;
 import com.pir.util.JsonViews;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,13 +29,9 @@ import javax.ws.rs.core.MediaType;
 public class LoginResource extends AbstractBaseResource {
 
     private final Logger logger = LoggerFactory.getLogger(LoginResource.class);
-    private UserService userService;
-
 
     @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
+    private IBusinessService businessService;
 
     @POST
     @Consumes( { MediaType.APPLICATION_JSON })
@@ -45,7 +41,7 @@ public class LoginResource extends AbstractBaseResource {
 
         logger.debug("{} attempting to login", loginDto.getUsername());
 
-        Long userId = userService.authenticate(loginDto.getUsername(), loginDto.getPassword());
+        Long userId = -1L;//businessService.authenticate(loginDto.getUsername(), loginDto.getPassword());
 
         try {
             if (userId != null) {

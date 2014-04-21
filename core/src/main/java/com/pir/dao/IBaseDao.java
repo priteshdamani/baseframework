@@ -27,6 +27,9 @@ public interface IBaseDao<T>
     List<T> findAllByCriteriaDistinct(Criterion... criteria);
     
     List<T> findAllByCriteriaWithOrder(Order order, Criterion... criteria);
+
+    List<T> findAllByCriteriaWithOrder(int pageSize, Order order, Criterion... criteria );
+
     List<T> findAllByCriteriaDistinctWithOrder(Order order, Criterion... criteria);
     
     void deleteAll(Collection<T> entities);

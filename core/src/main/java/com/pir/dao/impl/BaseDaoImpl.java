@@ -1,6 +1,7 @@
 package com.pir.dao.impl;
 
 import com.pir.dao.IBaseDao;
+import com.pir.util.MessageBlasterConstants;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -130,6 +131,17 @@ public class BaseDaoImpl<T> implements IBaseDao<T>
 	{
 		return createCriteria( criteria ).addOrder( order ).list();
 	}
+
+    public List<T> findAllByCriteriaWithOrder(int pageSize, Order order, Criterion... criteria )
+	{
+		Criteria criterion = createCriteria(criteria);
+        if (pageSize != MessageBlasterConstants.UNSET_PAGE_SIZE) {
+            criterion.setMaxResults(pageSize);
+            criterion.setFirstResult(0);
+        }
+        return criterion.addOrder(order).setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
+	}
+
 	public List<T> findAllByCriteriaDistinctWithOrder( Order order, Criterion... criteria )
 	{
 		return createCriteria( criteria ).addOrder( order ).setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();

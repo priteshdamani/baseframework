@@ -14,4 +14,6 @@ import com.pir.exceptions.UsernameAlreadyUsedException;
 public interface IUserService {
 
     User registerUser(User user) throws UsernameAlreadyUsedException, EmailAlreadyUsedException;
+
+    Long authenticate(String identifier, String password);
 }
